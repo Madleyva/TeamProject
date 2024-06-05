@@ -1,20 +1,22 @@
 let clocks = [];
 
+
 function setup() {
     createCanvas(800, 1200);
     textAlign(CENTER, CENTER);
     textSize(60);
+    noSmooth();
    
     let names = [
-        'LOS ANGELES PST', //-8
-        'Central USA', //-6
-        'Bolivia', //-4
-        'Greenland', //-2
-        'Greenwich England', //0
-        'South Africa', //+2
-        'Oman', //+4
-        'India', //+6
-        'China/Australia' //+8
+        'Los Angeles, USA-PST', //-8
+        'Chicago, USA-CST', //-6
+        'La Paz, Bolivia-BOT', //-4
+        'Nuuk, Greenland-WGT', //-2
+        'London, England-GMT', //0
+        'Johannesburg, South Africa-SAST', //+2
+        'Muscat, Oman-GST', //+4
+        'New Delhi, India-IST', //+6
+        'Beijing, China-CST' //+8
     ];
 
 
@@ -30,14 +32,15 @@ function setup() {
 
 function draw() {
     background('#E24672');
+     //Text 
+     noStroke();
+     fill('white');
+     text('World Time Zones', width / 2, 150);
 
     for (let clock of clocks) {  // To update and display clocks 
         clock.update();
         clock.display();
     }
-    //Text 
-    fill('white');
-    text('World Time Zones', width / 2, 150);
 
     // Group Project - Eli Fenix, Maddy Leyva, Erin Lee.
 }
@@ -59,15 +62,44 @@ class Clock {
         noStroke();
         ellipse(this.x, this.y, 200, 200); 
 
+
+        //Code for the minute ticks 
+        for (let i = 0; i < 60; i++){
+            let angle = map(i, 0, 60, 0, TWO_PI) - HALF_PI;
+            let x1 = this.x + cos(angle) * 92;
+            let y1 = this.y + sin(angle) * 92;
+            let x2 = this.x + cos(angle) * 99;
+            let y2 = this.y + sin(angle) * 99;
+            stroke(255);
+            strokeWeight(2);
+            line(x1, y1, x2, y2);
+        }
+
+
         //names of each time zone 
+        noStroke();
         fill('white');
-        textSize(16);
+        textSize(18);
         text(this.name, this.x, this.y - 120);
 
-        //To get the current time 
+        //To get the current time, Have to Update for clocks 
         let s = second();
         let m = minute();
         let h = hour();
+
+        //Adjust hours based on time zone offsets
+        /*if(this.name === 'Los Angeles, USA-PST') h = (h - 8+24)%24;*/
+
+        //I commented out the code above so it will be the current time on the computer, you can use it if you want or delete it when you code the correct times :0
+
+
+
+
+        //Formatted digital clock
+        let formattedTime = nf(h,2) + ':' + nf(m,2) + ':' + nf(s,2);
+        textSize(24);
+        text(formattedTime, this.x, this.y + 120);
+
 
         //The calculated angles for the clock hands 
         //The HALF_PI is creating lines that are angled 
@@ -89,7 +121,8 @@ class Clock {
         
         //The hour hand 
         stroke(255); //the color of the pointer
-        strokeWeight(6);
+        strokeWeight(6.5);
         line(this.x, this.y, this.x + cos(hourAngle) * 50, this.y + sin(hourAngle) * 50);
+
     }
 }
