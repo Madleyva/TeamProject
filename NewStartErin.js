@@ -18,12 +18,25 @@ function setup() {
         'Beijing, China-CST' //+8
     ];
 
+    let timeOffset = [0,2,4,6,8,10,12,14,16];
+
     // Adjust the positions for your specific layout
+    timeSelect = createSelect();
+    timeSelect.position(300, 750);
+
+    for(let i = 0; i < names.length; i++){
+        timeSelect.option(names[i]);
+    }
+    
+    timeSelect.changed(timeSelection);
+
 
     let i = 0;
     let x = 400
     let y = 450
-    clocks.push(new Clock(x, y, names[i]));
+    clocks.push(new Clock(x, y, names[0],timeOffset[0]));
+
+    // drop down menu
 
 }
 
@@ -42,6 +55,13 @@ function draw() {
     }
 
     // Group Project - Eli Fenix, Maddy Leyva, Erin Lee.
+}
+
+function timeSelection(){
+    let nameSelected = timeSelect.selected();
+    //let timeOff = timeSelect.value();
+    clocks[0].name = nameSelected;
+    //clocks[0].timeOffset = parseInt(timeOff);
 }
 
 class Clock {
@@ -82,6 +102,7 @@ class Clock {
         text(this.name, this.x, this.y - 100);
 
         //To get the current time, Have to Update for clocks 
+        let timeSet = hour()
         let s = second();
         let m = minute();
         let h = hour();
