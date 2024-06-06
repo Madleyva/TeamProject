@@ -1,4 +1,6 @@
 let clocks = [];
+let cosOffset = 0;
+let sinOffset = 0;
 
 
 function setup() {
@@ -25,7 +27,10 @@ function setup() {
         // Adjust the positions for your specific layout
         let x = 150 + (i % 3) * 250; //horizontal offset for each column
         let y = 350 + Math.floor(i / 3) * 300; //vertical offset for each column
-        clocks.push(new Clock(x, y, names[i])); 
+        cosOffset = i + 20 / i;
+        sinOffset = i + 20 / i;
+        clocks.push(new Clock(x, y, names[i],cosOffset,sinOffset)); 
+        
     }
 
 }
@@ -40,16 +45,19 @@ function draw() {
     for (let clock of clocks) {  // To update and display clocks 
         clock.update();
         clock.display();
+        
     }
 
     // Group Project - Eli Fenix, Maddy Leyva, Erin Lee.
 }
 
 class Clock {
-    constructor(x, y, name) {
+    constructor(x, y, name, cosAngle, sinAngle) {
         this.x = x; // x position of the clock
         this.y = y; // Y position of the clock
         this.name = name; // Name of each clock
+        this.cosOffset = cosOffset;
+        this.sinOffset = sinOffset;
     }
   
     update() {
@@ -122,7 +130,13 @@ class Clock {
         //The hour hand 
         stroke(255); //the color of the pointer
         strokeWeight(6.5);
-        line(this.x, this.y, this.x + cos(hourAngle) * 50, this.y + sin(hourAngle) * 50);
 
+        
+        // cosAngle = cos(hourAngle) * 50;
+        // sinAngle = sin(hourAngle) * 50 - 20;
+        
+        // line(this.x, this.y, this.x + cosAngle, this.y + sinAngle);
+        line(this.x, this.y, this.x + cos(hourAngle) * 50 - cosOffset, this.y + sin(hourAngle) * 50 - sinOffset);
     }
 }
+
