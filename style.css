@@ -10,9 +10,6 @@ h1{
     inline-size: 800px;
     text-align: center;
 }
-input, select {
-    margin: 20px;
-}
 #SeeMore-button{
     font-size: 20px;
     width: 200px;

@@ -1,7 +1,37 @@
+// Object containing image paths
+const imageData = {
+    image1: "images/jake-blucker-8LlJNFLTEm0-unsplash.jpg",
+    image2: "images/chicago-bean.png",
+    image3: "images/la-paz-cable-cars.png",
+    image4: "images/Nuuk-Greenland.png",
+    image5: "images/London.jpeg",
+    image6: "images/Johannesburg-Skyline.jpg",
+    image7: "images/Muscat-Oman.jpeg",
+    image8: "images/new-delhi-india.jpeg",
+    image9: "images/Beijing-China.png"
+};
+
+// Variable to track if we are displaying an image or a color background
+let isImage = true;
+
+// Variable to hold the currently displayed image
+let currentImage;
+
+// Index to track which image is currently being displayed
+let currentImageIndex = 0;
+
+// Array of image URLs from imageData
+let imageUrls = Object.values(imageData);
+
+// Arrays to hold clock objects and UI elements
 let clocks = [];
 let timeSelect;
 let colorButton;
-let isYellow = true; // State variable to track the current background color
+
+// Preload the initial image
+function preload() {
+    currentImage = loadImage(imageUrls[currentImageIndex]);
+}
 
 function setup() {
     let canvas = createCanvas(800, 1200);
@@ -9,6 +39,7 @@ function setup() {
     textAlign(CENTER, CENTER);
     noSmooth();
 
+    // List of timezone names
     let names = [
         'Los Angeles, USA-PST', //-8
         'Chicago, USA-CST', //-6
@@ -21,86 +52,103 @@ function setup() {
         'Beijing, China-CST' //+8
     ];
 
-    let timeOffset = [0, 2, 4, 6, 8, 10, 12, 14, 16];
+    // Corresponding time offsets for the timezones
+    let timeOffset = [-8, -6, -4, -2, 0, 2, 4, 6, 8];
 
-    // Creating the select dropdown for timezones
+    // Create a dropdown for selecting timezones
     timeSelect = createSelect();
     timeSelect.position(300, 750);
     timeSelect.parent('sketch-container');
 
+    // Populate the dropdown with timezone options
     for (let i = 0; i < names.length; i++) {
-        timeSelect.option(names[i]);
+        timeSelect.option(names[i], timeOffset[i]);
     }
 
     // Add a callback for when the dropdown value changes
     timeSelect.changed(timeSelection);
 
+    // Create an initial clock object
     let x = 400;
     let y = 450;
     clocks.push(new Clock(x, y, names[0], timeOffset[0]));
 
-    // Set initial background color
-    changeBackGroundColor('#f5f542'); // yellow
-
-    // Create a button to change the background color
-    colorButton = createButton('Change Color');
-    colorButton.position(width/2, 800);
+    // Create a button to change the background image
+    colorButton = createButton('Change Background');
+    colorButton.position(width / 2 - colorButton.width / 2, 800);
     colorButton.class('color-button');
-    colorButton.mousePressed(toggleBackgroundColor); // Change to turquoise on button press
+    colorButton.mousePressed(toggleBackground); // Change to the next image on button press
 }
 
 function draw() {
-    background('#E24672');
+    // If an image is to be displayed
+    if (isImage) {
+        background(220); // Light gray background for image display
+        image(currentImage, 0, 0, width, height); // Display the current image
+    } else {
+        background('images/jake-blucker-8LlJNFLTEm0-unsplash.jpg/'); // Background color for clock display
+    }
+
+    // Display the title
     noStroke();
     textSize(55);
     fill('white');
     text('World Time Zones', width / 2, 150);
 
-    for (let clock of clocks) {  // To update and display clocks 
+    // Update and display each clock
+    for (let clock of clocks) {
         clock.update();
         clock.display();
     }
 }
 
+// Function to handle timezone selection change
 function timeSelection() {
-    let nameSelected = timeSelect.selected();
-    clocks[0].name = nameSelected;
-
-    // Change background color when timezone is selected
-    changeBackGroundColor('#5ae8e6'); // turquoise
+    let nameSelected = timeSelect.selected(); // Get selected timezone name
+    let offsetSelected = timeSelect.value(); // Get selected timezone offset
+    clocks[0].name = nameSelected; // Update the clock name
+    clocks[0].timeOffset = int(offsetSelected); // Update the clock time offset
 }
 
-//parameter.... this took so long and im still not happy with it -maddy
-function changeBackGroundColor(hexColor) {
-    document.body.style.backgroundColor = hexColor;
+// Function to change the background image
+function changeBackgroundImage(imageUrl) {
+    currentImage = loadImage(imageUrl); // Load the new image
+    isImage = true; // Update state to indicate image background
 }
 
-function toggleBackgroundColor() {
-    if (isYellow) {
-        changeBackGroundColor('#5ae8e6'); // Change to turquoise
+// Function to toggle the background between images
+function toggleBackground() {
+    if (isImage) {
+        // If currently displaying an image, move to the next image in the array
+        currentImageIndex = (currentImageIndex + 1) % imageUrls.length;
+        changeBackgroundImage(imageUrls[currentImageIndex]);
     } else {
-        changeBackGroundColor('#f5f542'); // Change to yellow
+        // If not displaying an image, switch to image display mode
+        isImage = true;
+        changeBackgroundImage(imageUrls[currentImageIndex]);
     }
-    isYellow = !isYellow; // Toggle the state
 }
 
+// Clock class to create and display clock objects
 class Clock {
-    constructor(x, y, name) {
+    constructor(x, y, name, timeOffset) {
         this.x = x; // x position of the clock
-        this.y = y; // Y position of the clock
-        this.name = name; // Name of each clock
+        this.y = y; // y position of the clock
+        this.name = name; // Name of the timezone
+        this.timeOffset = timeOffset; // Time offset from UTC
     }
 
     update() {
-        // Update clock logic if needed
+        // Update clock logic if needed (currently not used)
     }
 
     display() {
+        // Draw the clock face
         fill(51);
         noStroke();
         ellipse(this.x, this.y, 400, 400);
 
-        // Code for the minute ticks 
+        // Draw minute ticks
         for (let i = 0; i < 60; i++) {
             let angle = map(i, 0, 60, 0, TWO_PI) - HALF_PI;
             let x1 = this.x + 2 * cos(angle) * 92;
@@ -112,41 +160,41 @@ class Clock {
             line(x1, y1, x2, y2);
         }
 
-        //Name coordinates and font sizes
+        // Display the timezone name
         noStroke();
         fill('white');
         textSize(18);
         text(this.name, this.x, this.y - 100);
 
-        //To get the current time
-        let s = second();
-        let m = minute();
-        let h = hour();
+        // Get the current time in UTC
+        let utc = new Date();
+        let s = utc.getUTCSeconds();
+        let m = utc.getUTCMinutes();
+        let h = utc.getUTCHours() + this.timeOffset;
 
-        //Formatted digital clock
-        let formattedTime = nf(h, 2) + ':' + nf(m, 2) + ':' + nf(s, 2);
+        // Format the digital clock time
+        let formattedTime = nf(h % 24, 2) + ':' + nf(m, 2) + ':' + nf(s, 2);
         textSize(24);
         text(formattedTime, this.x, this.y + 120);
 
-        //Calculated angles for the clock hands 
+        // Calculate angles for the clock hands
         let secondAngle = map(s, 0, 60, 0, TWO_PI) - HALF_PI;
         let minuteAngle = map(m, 0, 60, 0, TWO_PI) - HALF_PI;
         let hourAngle = map(h % 12, 0, 12, 0, TWO_PI) - HALF_PI;
 
-        // The second hand 
+        // Draw the second hand
         stroke('red');
         strokeWeight(2);
         line(this.x, this.y, this.x + cos(secondAngle) * 120, this.y + sin(secondAngle) * 120);
 
-        // The minute hand 
+        // Draw the minute hand
         stroke(255);
         strokeWeight(3.75);
         line(this.x, this.y, this.x + cos(minuteAngle) * 140, this.y + sin(minuteAngle) * 140);
 
-        // The hour hand 
+        // Draw the hour hand
         stroke(255);
         strokeWeight(6.5);
         line(this.x, this.y, this.x + cos(hourAngle) * 105, this.y + sin(hourAngle) * 100);
     }
 }
-// Eli Fenix, Maddy Leyva, Erin Lee
