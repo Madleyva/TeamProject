@@ -1,14 +1,14 @@
 // Object containing image paths
 const imageData = {
-    image1: "images/jake-blucker-8LlJNFLTEm0-unsplash.jpg",
-    image2: "images/chicago-bean.png",
-    image3: "images/la-paz-cable-cars.png",
-    image4: "images/Nuuk-Greenland.png",
-    image5: "images/London.jpeg",
-    image6: "images/Johannesburg-Skyline.jpg",
-    image7: "images/Muscat-Oman.jpeg",
-    image8: "images/new-delhi-india.jpeg",
-    image9: "images/Beijing-China.png"
+    image1: "images/0.png",
+    image2: "images/1.png",
+    image3: "images/2.png",
+    image4: "images/3.png",
+    image5: "images/4.png",
+    image6: "images/5.png",
+    image7: "images/6.png",
+    image8: "images/7.png",
+    image9: "images/8.png"
 };
 
 // Variable to track if we are displaying an image or a color background
@@ -26,7 +26,7 @@ let imageUrls = Object.values(imageData);
 // Arrays to hold clock objects and UI elements
 let clocks = [];
 let timeSelect;
-let colorButton;
+let slider;
 
 // Preload the initial image
 function preload() {
@@ -38,6 +38,12 @@ function setup() {
     canvas.parent('sketch-container'); // Ensures the canvas is inside the 'sketch-container' div
     textAlign(CENTER, CENTER);
     noSmooth();
+
+    //created slider
+    slider = createSlider(0, 255, 0, 0);
+    slider.position(445, 850);
+    slider.size(120);
+
 
     // List of timezone names
     let names = [
@@ -57,12 +63,20 @@ function setup() {
 
     // Create a dropdown for selecting timezones
     timeSelect = createSelect();
-    timeSelect.position(300, 750);
+    timeSelect.position(400, 750);
     timeSelect.parent('sketch-container');
+    timeSelect.size(200, 50);
+    timeSelect.class('rounded-dropdown');
+ 
 
     // Populate the dropdown with timezone options
     for (let i = 0; i < names.length; i++) {
-        timeSelect.option(names[i], timeOffset[i]);
+        let ov = {
+            'timeOffset': timeOffset[i],
+            'name': names[i],
+            'index': i
+        }
+        timeSelect.option(names[i], JSON.stringify(ov));
     }
 
     // Add a callback for when the dropdown value changes
@@ -72,22 +86,25 @@ function setup() {
     let x = 400;
     let y = 450;
     clocks.push(new Clock(x, y, names[0], timeOffset[0]));
-
-    // Create a button to change the background image
-    colorButton = createButton('Change Background');
-    colorButton.position(width / 2 - colorButton.width / 2, 800);
-    colorButton.class('color-button');
-    colorButton.mousePressed(toggleBackground); // Change to the next image on button press
 }
 
 function draw() {
+   //get the slider value (0-255) for opacity 
+   let alphaValue = slider.value();
+   if(isImage){ 
+    tint(alphaValue);
+    image(currentImage, 0, 0, width, height);
+   } else{
+    background(0, alphaValue);
+   }
+   /*
     // If an image is to be displayed
-    if (isImage) {
+    if (isImage) {+
         background(220); // Light gray background for image display
         image(currentImage, 0, 0, width, height); // Display the current image
     } else {
-        background('images/jake-blucker-8LlJNFLTEm0-unsplash.jpg/'); // Background color for clock display
-    }
+        background('images/0.png/'); // Background image for clock display
+    }*/
 
     // Display the title
     noStroke();
@@ -103,16 +120,20 @@ function draw() {
 }
 
 // Function to handle timezone selection change
-function timeSelection() {
-    let nameSelected = timeSelect.selected(); // Get selected timezone name
-    let offsetSelected = timeSelect.value(); // Get selected timezone offset
+function timeSelection(select) {
+
+    let nameSelected = JSON.parse(this.selected()).name; // Get selected timezone name
+    let offsetSelected = JSON.parse(this.selected()).timeOffset; // Get selected timezone offset
+    
     clocks[0].name = nameSelected; // Update the clock name
     clocks[0].timeOffset = int(offsetSelected); // Update the clock time offset
+    changeBackgroundImage(JSON.parse(this.selected()).index);
+    
 }
 
 // Function to change the background image
 function changeBackgroundImage(imageUrl) {
-    currentImage = loadImage(imageUrl); // Load the new image
+    currentImage = loadImage(`images/${imageUrl}.png`); // Load the new image
     isImage = true; // Update state to indicate image background
 }
 
@@ -139,13 +160,20 @@ class Clock {
     }
 
     update() {
-        // Update clock logic if needed (currently not used)
+        // allows the actual clock to show up
     }
 
     display() {
         // Draw the clock face
-        fill(51);
         noStroke();
+        //white border (outside)
+        fill(200);
+        ellipse(this.x, this.y, 460, 460);
+        //black border (outside)
+        fill(20);
+        ellipse(this.x, this.y, 450, 450);
+        //main face for clock
+        fill(51);
         ellipse(this.x, this.y, 400, 400);
 
         // Draw minute ticks
