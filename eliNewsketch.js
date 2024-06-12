@@ -16,9 +16,14 @@ function preload() {
 }
 
 function setup() {
-    createCanvas(800, 1200);
+    let canvas = createCanvas(800, 1200);
+    canvas.parent('canvas-container'); // Attach canvas to the div in the clocks.html
     textAlign(CENTER, CENTER);
     noSmooth();
+
+    // Create a slider for controlling the gradients and center it at the bottom
+    gradientSlider = createSlider(0, 255, 128);
+    gradientSlider.position((width - gradientSlider.width) / 1.4, height - 910);
 
     let names = [
         'Johannesburg, South Africa-SAST',
@@ -39,7 +44,7 @@ function setup() {
         'The capital of Oman.',
         'The capital of India.',
         'The capital of China.',
-        'Home of the film industry.',
+        'Known for its film industry.',
         'Famous for its architecture.',
         'The highest capital city in the world.',
         'The capital of Greenland.',
@@ -61,11 +66,13 @@ function draw() {
 
     noStroke();
     fill('white');
-    text('World Time Zones', width / 2, 170);
+    text('World Time Zones', width / 2, 50);
+
+    let gradientValue = gradientSlider.value();
 
     for (let clock of clocks) {
         clock.update();
-        clock.display();
+        clock.display(gradientValue);
         if (clock.isMouseOver()) {
             clock.displayImageAndText();
         }
@@ -88,8 +95,10 @@ class Clock {
         // Update clock logic if needed
     }
 
-    display() {
-        fill(51);
+    display(gradientValue) {
+        // Use the gradient value for the fill color
+        let gradientColor = lerpColor(color(0), color(255), gradientValue / 255);
+        fill(gradientColor);
         noStroke();
         ellipse(this.x, this.y, 200, 200);
 
