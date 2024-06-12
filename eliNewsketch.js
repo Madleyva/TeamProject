@@ -22,8 +22,9 @@ function setup() {
     noSmooth();
 
     // Create a slider for controlling the gradients and center it at the bottom
-    gradientSlider = createSlider(0, 255, 128);
-    gradientSlider.position((width - gradientSlider.width) / 1.4, height - 910);
+    gradientSlider = createSlider(0, 255, 0); // Start at 0
+    gradientSlider.size(400); // Make the slider longer
+    gradientSlider.position((width - gradientSlider.width) / 1.1, height - 880); // Center the slider
 
     let names = [
         'Johannesburg, South Africa-SAST',
