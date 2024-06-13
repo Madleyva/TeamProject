@@ -41,7 +41,7 @@ function setup() {
 
     //created slider
     slider = createSlider(0, 255, 0, 0);
-    slider.position(445, 850);
+    slider.position(CENTER, CENTER);
     slider.size(120);
 
 
@@ -97,14 +97,6 @@ function draw() {
    } else{
     background(0, alphaValue);
    }
-   /*
-    // If an image is to be displayed
-    if (isImage) {+
-        background(220); // Light gray background for image display
-        image(currentImage, 0, 0, width, height); // Display the current image
-    } else {
-        background('images/0.png/'); // Background image for clock display
-    }*/
 
     // Display the title
     noStroke();
