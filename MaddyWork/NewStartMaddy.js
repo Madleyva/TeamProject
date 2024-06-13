@@ -59,7 +59,7 @@ function setup() {
     ];
 
     // Corresponding time offsets for the timezones
-    let timeOffset = [-8, -6, -4, -2, 0, 2, 4, 6, 8];
+    let timeOffset = [-7, -5, -4, -1, 1, 2, 4, 6, 8];
 
     // Create a dropdown for selecting timezones
     timeSelect = createSelect();
